@@ -12,10 +12,10 @@ Proyek ini bertujuan untuk melakukan analisis performa dan perbandingan waktu ek
 
 Berikut adalah daftar algoritma pengurutan yang diimplementasikan beserta karakteristik kompleksitas waktunya:
 
-| Algoritma      | Best Case          | Average Case          | Worst Case    | Ket. Tambahan                                                         |
-| :------------- | :----------------- | :-------------------- | :------------ | :-------------------------------------------------------------------- |
-| **Heap Sort**  | $\Omega(n \log n)$ | $\Theta(n \log n)$    | $O(n \log n)$ | Berbasis struktur data _Binary Heap_.                                 |
-| **Merge Sort** | $\Omega(n \log n)$ | $\Theta(n \log n)$    | $O(n \log n)$ | Menggunakan pendekatan _Divide and Conquer_.                          |
-| **Quick Sort** | $\Omega(n \log n)$ | $\Theta(n^2)$         | $O(n^2)$      | Menggunakan pendekatan _Partition_.                                   |
-| **Shell Sort** | $\Omega(n \log n)$ | $\Theta(n(\log n)^2)$ | $O(n^2)$      | Pengembangan dari _Insertion Sort_ dengan sistem jeda (_gap_).        |
-| **Tim Sort**   | $\Omega(n)$        | $\Theta(n \log n)$    | $O(n \log n)$ | Algoritma hibrida (_Merge_ & _Insertion_) bawaan Python (`sorted()`). |
+| Algoritma      | Best Case     | Average Case  | Worst Case    |
+| :------------- | :------------ | :------------ | :------------ |
+| **Heap Sort**  | $O(n \log n)$ | $O(n \log n)$ | $O(n \log n)$ |
+| **Merge Sort** | $O(n \log n)$ | $O(n \log n)$ | $O(n \log n)$ |
+| **Quick Sort** | $O(n \log n)$ | $O(n \log n)$ | $O(n^2)$      |
+| **Shell Sort** | $O(n \log n)$ | $O(n^1.25)$   | $O(n^2)$      |
+| **Tim Sort**   | $O(n)$        | $O(n \log n)$ | $O(n \log n)$ |
