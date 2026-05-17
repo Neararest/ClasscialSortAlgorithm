@@ -17,5 +17,5 @@ Berikut adalah daftar algoritma pengurutan yang diimplementasikan beserta karakt
 | **Heap Sort**  | $O(n \log n)$ | $O(n \log n)$ | $O(n \log n)$ |
 | **Merge Sort** | $O(n \log n)$ | $O(n \log n)$ | $O(n \log n)$ |
 | **Quick Sort** | $O(n \log n)$ | $O(n \log n)$ | $O(n^2)$      |
-| **Shell Sort** | $O(n \log n)$ | $O(n^1.25)$   | $O(n^2)$      |
+| **Shell Sort** | $O(n \log n)$ | $O(n^{1.25})$ | $O(n^2)$      |
 | **Tim Sort**   | $O(n)$        | $O(n \log n)$ | $O(n \log n)$ |
