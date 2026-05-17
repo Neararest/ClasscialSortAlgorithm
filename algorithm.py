@@ -99,6 +99,7 @@ def tim_sort(arr):
 algoritma = {
     "Heap Sort": heap_sort,
     "Merge Sort": mergeSort,
+    "Quick Sort": quick_sort,
     "Shell Sort": shell_sort,
     "Tim Sort": tim_sort,
 }
