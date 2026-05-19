@@ -68,7 +68,7 @@ class StreamlitApp:
             st.error("Struktur file tidak sesuai! kolom Nama Siswa dan Kelas harus ada")
             return
         
-        st.subheader("🔍 Filter Kelas Siswa")
+        st.subheader("Filter Kelas Siswa")
         daftar_kelas_unik = df["Kelas"].unique().tolist()
         
         kelas_terpilih = st.multiselect(
@@ -98,63 +98,82 @@ class StreamlitApp:
         st.dataframe(df_filtered, width="stretch", hide_index=True)
         
         st.markdown("---")
-        st.subheader("Pengurutan Data ")
         
-        col1, col2 = st.columns(2)
-        with col1:
-            daftar_kolom_nilai = mapel_murni + ["Rata-Rata"]
-            kolom_terpilih = st.selectbox(
-                "Pilih Mata Pelajaran / Nilai yang ingin diurutkan:",
-                (daftar_kolom_nilai),
-                placeholder="Pilih Mata Pelajaran / Nilai yang ingin diurutkan"
+        with st.container(border=True):
+            st.subheader("Konfigurasi Pengurutan")
+            
+            col_setup1, col_setup2, col_setup3 = st.columns(3)
+            
+            with col_setup1:
+                daftar_kolom_nilai = mapel_murni + ["Rata-Rata"]
+                kolom_terpilih = st.selectbox("Pilih Mata Pelajaran / Nilai:", daftar_kolom_nilai)
+                
+            with col_setup2:
+                daftar_algo = {
+                    "Heap Sort": heap_sort,
+                    "Tim Sort": tim_sort,
+                    "Merge Sort": mergeSort,
+                    "Quick Sort": quick_sort,
+                    "Shell Sort": shell_sort
+                }
+                algo_terpilih = st.selectbox("Pilih Algoritma Sorting:", list(daftar_algo.keys()))
+                
+            with col_setup3:
+                opsi_kelas_hasil = df_filtered["Kelas"].unique().tolist()
+                kelas_hasil_terpilih = st.multiselect(
+                    "📌 Filter Kelas pada Hasil:",
+                    options=opsi_kelas_hasil,
+                    default=opsi_kelas_hasil
                 )
             
-        with col2:
-            daftar_algo = {
-                "Heap Sort": heap_sort,
-                "Tim Sort": tim_sort,
-                "Merge Sort": mergeSort,
-                "Quick Sort": quick_sort,
-                "Shell Sort": shell_sort
-            }
-            algo_terpilih = st.selectbox(
-                "Pilih Algoritma Sorting:", 
-                list(daftar_algo.keys()),
-                placeholder="Pilih Algoritma Sorting"
-                )
+            st.markdown("---")
+            col_action1, col_action2 = st.columns([2, 1])
             
-        tipe_urut = st.radio(
-            "Sorting:", 
-            ["Terkecil", "Terbesar"],
-            horizontal=True
-            )
+            with col_action1:
+                opsi = ["Descending", "Ascending"]
+                pilihan = st.pills(
+                    "Pilih Urutan:",
+                    opsi,
+                    selection_mode="single"
+                )
+                tipe_urut = pilihan[0]
 
-        if st.button("Mulai Proses Pengurutan"):
-            st.info(f"Memproses pengurutan kolom **{kolom_terpilih}** menggunakan **{algo_terpilih}**...")
+            with col_action2:
+                st.write("") 
+                tombol_mulai = st.button("Mulai Pengurutan", use_container_width=True)
+
+        if tombol_mulai:
+            wadah_pesan = st.empty()
+            wadah_pesan.info(f"Memproses pengurutan kolom **{kolom_terpilih}** menggunakan **{algo_terpilih}**...")
             
+            # Proses sorting data utama
             df_sorted = df_filtered.copy()
             list_nilai = df_sorted[kolom_terpilih].tolist()
             
             fungsi_sorting = daftar_algo[algo_terpilih]
             hasil_sort = fungsi_sorting(list_nilai)
             
-            if hasil_sort is not None:
-                nilai_terurut = hasil_sort
-            else:
-                nilai_terurut = list_nilai
+            nilai_terurut = hasil_sort if hasil_sort is not None else list_nilai
             
-            if tipe_urut == "Terbesar":
-                nilai_terurut = nilai_terurut[::-1]
-                
-            df_sorted = df_sorted.set_index(kolom_terpilih).loc[nilai_terurut].reset_index()
+            if tipe_urut == "Descending":
+                nilai_terurut.reverse()
+                apakah_ascending = False
+            else:
+                apakah_ascending = True
+
+            df_sorted = df_sorted.sort_values(by=kolom_terpilih, ascending=apakah_ascending)
+            
+            # --- PENERAPAN FILTER KELAS KEDUA ---
+            # Menyaring hasil sorting berdasarkan pilihan multiselect kelas hasil
+            df_sorted = df_sorted[df_sorted["Kelas"].isin(kelas_hasil_terpilih)]
             
             kolom_nama_asli = "Nama Siswa" if "Nama Siswa" in df_filtered.columns else "Nama"
-            
             kolom_tampil = [kolom_nama_asli, "Kelas", kolom_terpilih]
             df_sorted = df_sorted[kolom_tampil]
             
-            st.success("Pengurutan Berhasil!")
-            st.subheader(f"Hasil Pengurutan Berdasarkan: {kolom_terpilih}")
+            # Tampilkan hasil
+            wadah_pesan.success("✅ Pengurutan Berhasil!")
+            st.subheader(f"📊 Hasil Pengurutan Berdasarkan: {kolom_terpilih}")
             st.dataframe(df_sorted, width="stretch", hide_index=True)
 
     def page_algoritma(self):
