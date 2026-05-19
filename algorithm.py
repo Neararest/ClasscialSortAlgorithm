@@ -104,17 +104,18 @@ algoritma = {
     "Tim Sort": tim_sort,
 }
 
-hasil = []
-for nama, func in algoritma.items():
-    row = {"Algoritma": nama}
-    for nama_data, data in dataset:
-        arr = data.copy()
-        start = time.perf_counter()
-        func(arr)   
-        end = time.perf_counter()
-        
-        row[nama_data] = f"{end - start:.6f}"
-    hasil.append(row)
+if __name__ == "__main__":
+    hasil = []
+    for nama, func in algoritma.items():
+        row = {"Algoritma": nama}
+        for nama_data, data in dataset:
+            arr = data.copy()
+            start = time.perf_counter()
+            func(arr)   
+            end = time.perf_counter()
 
-df = pd.DataFrame(hasil)
-print(df.to_string(index=False, col_space=15, justify='left'))
+            row[nama_data] = f"{end - start:.6f}"
+        hasil.append(row)
+
+    df = pd.DataFrame(hasil)
+    print(df.to_string(index=False, col_space=15, justify='left'))
