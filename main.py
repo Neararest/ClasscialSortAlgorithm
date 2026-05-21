@@ -287,27 +287,22 @@ class StreamlitApp:
         st.title("Perbandingan Algoritma")
         st.markdown("---")
         with st.container(border=True):
-            st.subheader("⚙️ Atur Parameter Simulasi")
+            st.subheader("Parameter Simulasi")
             
-            # User bisa memilih lompatan data pengujian secara dinamis
             opsi_max_n = st.select_slider(
                 "Pilih Batas Maksimal Jumlah Data (N):",
-                options=[100, 500, 1000, 5000, 10000, 25000],
-                value=5000
+                options=[100, 250, 500, 1000, 5000, 10000, 25000, 50000, 100000, 250000, 500000, 1000000],
+                value=25000
             )
             
             st.write("")
-            tombol_simulasi = st.button("🚀 Jalankan Pengujian Real-Time", use_container_width=True)
+            tombol_simulasi = st.button("Jalankan Pengujian Real-Time", use_container_width=True)
 
-        # ========================================================
-        # PROSES SIMULASI SAAT TOMBOL DIKLIK
-        # ========================================================
         if tombol_simulasi:
-            # Tentukan list ukuran data berdasarkan batas yang dipilih user
-            semua_n = [10, 50, 100, 500, 1000, 5000, 10000, 25000]
+
+            semua_n = [100, 250, 500, 1000, 5000, 10000, 25000, 50000, 100000, 250000, 500000, 1000000]
             ukuran_uji = [n for n in semua_n if n <= opsi_max_n]
             
-            # Map fungsi algoritma kamu
             daftar_algo = {
                 "Heap Sort": heap_sort,
                 "Tim Sort": tim_sort,
@@ -316,8 +311,6 @@ class StreamlitApp:
                 "Shell Sort": shell_sort
             }
             
-            # Siapkan struktur penampung hasil untuk DataFrame
-            # Format: {'Algoritma': [], 'N=10': [], 'N=100': [], ...}
             baris_hasil = []
             
             progress_bar = st.progress(0, text="Memulai simulasi...")
@@ -329,37 +322,30 @@ class StreamlitApp:
                 catatan_algo = {"Algoritma": nama_algo}
                 
                 for n in ukuran_uji:
-                    # Buat data acak rentang 0-100 sesuai spesifikasi awalmu
+                    
                     data_acak = [random.randint(0, 100) for _ in range(n)]
                     
-                    # Hitung waktu eksekusi dalam detik
                     mulai = time.perf_counter()
                     fungsi_sort(data_acak)
                     selesai = time.perf_counter()
                     
                     durasi = selesai - mulai
-                    # Simpan hasil dengan presisi tinggi (6 angka di belakang koma seperti terminalmu)
+                    
                     catatan_algo[f"N={n}"] = round(durasi, 6)
                     
                 baris_hasil.append(catatan_algo)
                 
-            progress_bar.empty() # Hapus progress bar jika selesai
-            st.success("✅ Simulasi Pengujian Selesai!")
+            progress_bar.empty()
+            st.success("Simulasi Pengujian Selesai!")
             
-            # Buat DataFrame Utama untuk Tabel
             df_hasil = pd.DataFrame(baris_hasil)
             
-            # ========================================================
-            # VISUALISASI HASIL (TABEL & GRAFIK LINE)
-            # ========================================================
-            st.subheader("📋 Tabel Hasil Komparasi Kecepatan (Detik)")
+            st.subheader("Tabel Hasil Komparasi Kecepatan (Detik)")
             st.dataframe(df_hasil, hide_index=True, use_container_width=True)
             
             st.markdown("---")
-            st.subheader("📈 Grafik Tren Pertumbuhan Waktu (Time Complexity)")
+            st.subheader("Grafik Tren Pertumbuhan Waktu (Time Complexity)")
             
-            # Transformasi data agar sesuai dengan format st.line_chart Streamlit
-            # Sumbu X harus berupa Ukuran Data, Sumbu Y berupa Detik, Kolom berupa Nama Algoritma
             df_grafik = df_hasil.set_index("Algoritma").T
             df_grafik.index = [int(idx.split("=")[1]) for idx in df_grafik.index]
             
