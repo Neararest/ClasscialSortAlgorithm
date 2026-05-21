@@ -2,3 +2,5 @@ pandas
 matplotlib
 streamlit
 streamlit-option-menu
+# pygwalker
+

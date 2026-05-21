@@ -4,7 +4,9 @@ import time
 import random
 from algorithm import heap_sort, mergeSort, quick_sort, tim_sort, shell_sort
 from streamlit_option_menu import option_menu
+# from pygwalker.api.streamlit import StreamlitRenderer
 import streamlit_shadcn_ui as ui
+
 
 class StreamlitApp:
     def __init__(self):
@@ -313,44 +315,53 @@ class StreamlitApp:
             
             baris_hasil = []
             
-            progress_bar = st.progress(0, text="Memulai simulasi...")
-            total_langkah = len(daftar_algo)
+            with st.spinner("Sedang menguji ke-5 algoritma secara real-time... Harap tunggu."):
+                
+                total_langkah = len(daftar_algo)
+                
+                for index, (nama_algo, fungsi_sort) in enumerate(daftar_algo.items()):
+                    status_uji = st.caption(f"Sedang berjalan: **{nama_algo}** ({index+1}/{total_langkah})")
+                    
+                    catatan_algo = {"Algoritma": nama_algo}
+                    
+                    for n in ukuran_uji:
+                        data_acak = [random.randint(0, 100) for _ in range(n)]
+                        
+                        mulai = time.perf_counter()
+                        fungsi_sort(data_acak)
+                        selesai = time.perf_counter()
+                        
+                        durasi = selesai - mulai
+                        catatan_algo[f"N={n}"] = round(durasi, 6)
+                        
+                    baris_hasil.append(catatan_algo)
+                    
+                    status_uji.empty()  
             
-            for index, (nama_algo, fungsi_sort) in enumerate(daftar_algo.items()):
-                progress_bar.progress((index + 1) / total_langkah, text=f"Menguji algoritma: {nama_algo}")
-                
-                catatan_algo = {"Algoritma": nama_algo}
-                
-                for n in ukuran_uji:
-                    
-                    data_acak = [random.randint(0, 100) for _ in range(n)]
-                    
-                    mulai = time.perf_counter()
-                    fungsi_sort(data_acak)
-                    selesai = time.perf_counter()
-                    
-                    durasi = selesai - mulai
-                    
-                    catatan_algo[f"N={n}"] = round(durasi, 6)
-                    
-                baris_hasil.append(catatan_algo)
-                
-            progress_bar.empty()
-            st.success("Simulasi Pengujian Selesai!")
+            
+            pesan = st.success("Pengujian Selesai!")
+            time.sleep(0.5)
+            pesan.empty()
             
             df_hasil = pd.DataFrame(baris_hasil)
-            
+
             st.subheader("Tabel Hasil Komparasi Kecepatan (Detik)")
             st.dataframe(df_hasil, hide_index=True, use_container_width=True)
             
             st.markdown("---")
             st.subheader("Grafik Tren Pertumbuhan Waktu (Time Complexity)")
             
-            df_grafik = df_hasil.set_index("Algoritma").T
-            df_grafik.index = [int(idx.split("=")[1]) for idx in df_grafik.index]
+            # df_long = pd.melt(
+            #     df_hasil,
+            #     id_vars=["Algoritma"],
+            #     var_name="Ukuran_Data",
+            #     value_name="Waktu Eksekusi"
+            # )
             
-            st.line_chart(df_grafik)
-            st.caption("Sumbu X: Jumlah Data (N) | Sumbu Y: Waktu Eksekusi (Detik). Semakin landai garisnya, semakin efisien algoritmanya.")
+            # df_long["Ukuran_Data"] = df_long["Ukuran_Data"].apply(lambda x: int(x.split("=")[1]))
+            
+            # pygwalker = StreamlitRenderer(df_long, spec="line_c.json", spec_io_mode="rw")
+            # pygwalker.explorer()
 
     def run(self):
         menu_terpilih = self.render_sidebar()
