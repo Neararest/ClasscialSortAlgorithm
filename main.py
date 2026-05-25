@@ -2,9 +2,9 @@ import streamlit as st
 import pandas as pd
 import time
 import random
+import plotly.express as px
 from algorithm import heap_sort, mergeSort, quick_sort, tim_sort, shell_sort
 from streamlit_option_menu import option_menu
-# from pygwalker.api.streamlit import StreamlitRenderer
 import streamlit_shadcn_ui as ui
 
 
@@ -205,9 +205,12 @@ class StreamlitApp:
                             "Quick Sort": quick_sort,
                             "Shell Sort": shell_sort
                         }
+
+                        opsi_tambahan = list(daftar_algo.keys()) + ["Semua Algoritma"]
+
                         algo_terpilih = st.selectbox(
                             "Pilih Algoritma Sorting:", 
-                            list(daftar_algo.keys()), 
+                            opsi_tambahan, 
                             key="sb_algo"
                         )
                     
@@ -252,39 +255,132 @@ class StreamlitApp:
                     )
 
                 if tombol_mulai:
-                    # wadah_pesan = st.empty()
-
                     df_sorted = df.copy()
+                    df_sorted = df_sorted[df_sorted["Kelas"].isin(kelas_hasil_terpilih)]
                     list_nilai = df_sorted[kolom_terpilih].tolist()
 
-                    fungsi_sorting = daftar_algo[algo_terpilih]
-                    hasil_sort = fungsi_sorting(list_nilai)
+                    if algo_terpilih == "Semua Algoritma":
+                        catatan_waktu = {}
+                        with st.spinner("Menguji efisiensi seluruh algoritma pada data siswa..."):
+                            for nama_algo, fungsi_sort in daftar_algo.items():
+                                salinan_data = list_nilai.copy()
+                                
+                                mulai = time.perf_counter()
+                                fungsi_sort(salinan_data)
+                                selesai = time.perf_counter()
+                                
+                                catatan_waktu[nama_algo] = round((selesai - mulai) * 1000, 4)
+                        
+                        nilai_terurut = list_nilai.copy()
+                        tim_sort(nilai_terurut)
+                        
+                        if pilihan == "Terbesar":
+                            nilai_terurut.reverse()
+                            apakah_ascending = False
+                        else:
+                            apakah_ascending = True
 
-                    nilai_terurut = hasil_sort if hasil_sort is not None else list_nilai
+                        
+                        df_sorted = df_sorted.sort_values(by=kolom_terpilih, ascending=apakah_ascending)
 
-                    if pilihan == "Terbesar":
-                        nilai_terurut.reverse()
-                        apakah_ascending = False
+                        if batas_tampil == "Top 5 Nilai":
+                            df_sorted = df_sorted.head(5)
+                        elif batas_tampil == "Top 10 Nilai":
+                            df_sorted = df_sorted.head(10)
+                            
+                        kolom_nama_asli = "Nama Siswa" if "Nama Siswa" in df.columns else "Nama"
+                        kolom_tampil = [kolom_nama_asli, "Kelas", kolom_terpilih]
+                        df_sorted = df_sorted[kolom_tampil]
+
+                        # DataFrame untuk Plotly
+                        df_komparasi = pd.DataFrame({
+                            "Algoritma": list(catatan_waktu.keys()),
+                            "Waktu Eksekusi (ms)": list(catatan_waktu.values())
+                        })
+
+                        st.session_state["hasil_df_siswa"] = df_sorted
+                        st.session_state["hasil_df_komparasi"] = df_komparasi
+                        st.session_state["mode_tampil"] = "Semua Algoritma"
+                        st.session_state["kolom_terpilih"] = kolom_terpilih
+                        st.session_state["batas_tampil"] = batas_tampil
+                        st.session_state["total_data"] = len(list_nilai)
+
                     else:
-                        apakah_ascending = True
+                        fungsi_sorting = fungsi_sorting_dict[algo_terpilih]
+                        hasil_sort = fungsi_sorting(list_nilai)
 
-                    df_sorted = df_sorted.sort_values(by=kolom_terpilih, ascending=apakah_ascending)
+                        nilai_terurut = hasil_sort if hasil_sort is not None else list_nilai
 
-                    df_sorted = df_sorted[df_sorted["Kelas"].isin(kelas_hasil_terpilih)]
+                        if pilihan == "Terbesar":
+                            nilai_terurut.reverse()
+                            apakah_ascending = False
+                        else:
+                            apakah_ascending = True
 
-                    if batas_tampil == "Top 5 Nilai":
-                        df_sorted = df_sorted.head(5)
-                    elif batas_tampil == "Top 10 Nilai":
-                        df_sorted = df_sorted.head(10)
+                        df_sorted = df_sorted.sort_values(by=kolom_terpilih, ascending=apakah_ascending)
 
-                    kolom_nama_asli = "Nama Siswa" if "Nama Siswa" in df.columns else "Nama"
-                    kolom_tampil = [kolom_nama_asli, "Kelas", kolom_terpilih]
-                    df_sorted = df_sorted[kolom_tampil]
+                        if batas_tampil == "Top 5 Nilai":
+                            df_sorted = df_sorted.head(5)
+                        elif batas_tampil == "Top 10 Nilai":
+                            df_sorted = df_sorted.head(10)
 
-                    st.write("")
-                    st.subheader(f"{batas_tampil} Berdasarkan {kolom_terpilih}")
-                    st.dataframe(df_sorted, width="stretch", hide_index=True)
+                        kolom_nama_asli = "Nama Siswa" if "Nama Siswa" in df.columns else "Nama"
+                        kolom_tampil = [kolom_nama_asli, "Kelas", kolom_terpilih]
+                        df_sorted = df_sorted[kolom_tampil]
 
+                        st.session_state["hasil_df_siswa"] = df_sorted
+                        st.session_state["mode_tampil"] = "Tunggal"
+                        st.session_state["algo_terpilih"] = algo_terpilih
+                        st.session_state["kolom_terpilih"] = kolom_terpilih
+                        st.session_state["batas_tampil"] = batas_tampil
+
+                if "mode_tampil" in st.session_state:
+                    if st.session_state["mode_tampil"] == "Semua Algoritma":
+                        df_sorted = st.session_state["hasil_df_siswa"]
+                        df_komparasi = st.session_state["hasil_df_komparasi"]
+                        kolom_terpilih = st.session_state["kolom_terpilih"]
+                        batas_tampil = st.session_state["batas_tampil"]
+                        total_siswa = st.session_state["total_data"]
+
+                        st.write("")
+
+                        col_t1, col_t2, col_t3, col_t4, col_t5 = st.columns([1,1,1,1,1])
+                        with col_t3:
+                            tab = ui.tabs(
+                                options=["Tabel", "Grafik"], 
+                                default_value="Tabel", 
+                                key="tabs_tabel_grafik"
+                            )
+                        if tab == "Tabel":
+                            st.write("")
+                            st.subheader(f"{batas_tampil} Berdasarkan {kolom_terpilih}")
+                            st.dataframe(df_sorted, use_container_width=True, hide_index=True)
+                            
+                        elif tab == "Grafik":
+                            st.write("")
+                            st.subheader("  Analisis Komparasi Kecepatan Komputasi")
+
+                            fig = px.bar(
+                                df_komparasi,
+                                x="Algoritma",
+                                y="Waktu Eksekusi (ms)",
+                                color="Algoritma",
+                                text_auto='.4f',
+                                title=f"Waktu Proses Pengurutan Kolom {kolom_terpilih} ({total_siswa} Data)"
+                            )
+                            fig.update_layout(showlegend=False)
+                            st.plotly_chart(fig, use_container_width=True)
+                            
+                    elif st.session_state["mode_tampil"] == "tunggal":
+                        df_sorted = st.session_state["hasil_df_siswa"]
+                        algo_terpilih = st.session_state["algo_terpilih"]
+                        kolom_terpilih = st.session_state["kolom_terpilih"]
+                        batas_tampil = st.session_state["batas_tampil"]
+
+                        st.write("")
+                        st.subheader(f"{batas_tampil} Berdasarkan {kolom_terpilih} (Menggunakan {algo_terpilih})")
+                        st.dataframe(df_sorted, use_container_width=True, hide_index=True)
+                    
     def page_algoritma(self):
         st.title("Perbandingan Algoritma")
         st.markdown("---")
@@ -293,8 +389,8 @@ class StreamlitApp:
             
             opsi_max_n = st.select_slider(
                 "Pilih Batas Maksimal Jumlah Data (N):",
-                options=[100, 250, 500, 1000, 5000, 10000, 25000, 50000, 100000, 250000, 500000, 1000000],
-                value=25000
+                options=[100, 500, 1000, 5000, 10000, 50000, 100000, 250000, 500000, 1000000, 1500000],
+                value=50000
             )
             
             st.write("")
@@ -302,7 +398,7 @@ class StreamlitApp:
 
         if tombol_simulasi:
 
-            semua_n = [100, 250, 500, 1000, 5000, 10000, 25000, 50000, 100000, 250000, 500000, 1000000]
+            semua_n = [100, 500, 1000, 5000, 10000, 50000, 100000, 250000, 500000, 1000000, 1500000]
             ukuran_uji = [n for n in semua_n if n <= opsi_max_n]
             
             daftar_algo = {
@@ -338,7 +434,6 @@ class StreamlitApp:
                     
                     status_uji.empty()  
             
-            
             pesan = st.success("Pengujian Selesai!")
             time.sleep(0.5)
             pesan.empty()
@@ -351,17 +446,23 @@ class StreamlitApp:
             st.markdown("---")
             st.subheader("Grafik Tren Pertumbuhan Waktu (Time Complexity)")
             
-            # df_long = pd.melt(
-            #     df_hasil,
-            #     id_vars=["Algoritma"],
-            #     var_name="Ukuran_Data",
-            #     value_name="Waktu Eksekusi"
-            # )
+            df_grafik = df_hasil.set_index("Algoritma").T
+            df_grafik.index = [int(idx.split("=")[1]) for idx in df_grafik.index]
+            df_grafik.index.name = "Jumlah Data (N)"
+
+            fig = px.line(
+                df_grafik,
+                labels={"value": "Waktu Eksekusi (Detik)", "variable": "Algoritma"},
+                markers=True 
+                )
             
-            # df_long["Ukuran_Data"] = df_long["Ukuran_Data"].apply(lambda x: int(x.split("=")[1]))
-            
-            # pygwalker = StreamlitRenderer(df_long, spec="line_c.json", spec_io_mode="rw")
-            # pygwalker.explorer()
+            fig.update_layout(
+                hovermode="x unified",
+                legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
+            )
+
+            st.plotly_chart(fig, use_container_width=True)
+            st.caption("Arahkan kursor ke titik grafik untuk melihat detail waktu. Klik nama algoritma di legenda atas untuk menyembunyikan garis.")
 
     def run(self):
         menu_terpilih = self.render_sidebar()
