@@ -2,18 +2,19 @@ import streamlit as st
 import pandas as pd
 import time
 import random
+from PIL import Image
 import plotly.express as px
 from algorithm import heap_sort, mergeSort, quick_sort, tim_sort, shell_sort
 from streamlit_option_menu import option_menu
 import streamlit_shadcn_ui as ui
 
-
 class StreamlitApp:
     def __init__(self):
-        self.title = "Aplikasi testing algoritma "
+        self.title = "Sortify"
+        logo = Image.open("Sortify.png")
         st.set_page_config(
             page_title=self.title,
-            page_icon="💠",
+            page_icon=logo,
             layout="wide"
         )
         
@@ -49,10 +50,6 @@ class StreamlitApp:
                         "margin": "0px",
                         "transition": "color 0.2s ease, background-color 0.2s ease"
                     },
-                    "nav-link:hover": {
-                        "background-color": "#2E4A3F", 
-                        "color": "#A3E635",            
-                    },
                     "nav-link-selected": {
                         "background-color": "green",
                         "color": "#FFFFFF"
@@ -72,15 +69,76 @@ class StreamlitApp:
             return None
 
     def page_home(self):
-        st.title("Halaman Beranda")
+        st.title("SORTIFY")
         st.markdown("---")
-        st.write("Selamat datang di aplikasi dashboard utama.")
-        st.info("Silakan pilih menu di samping untuk berpindah halaman.")
+        st.subheader("Sistem Analisis Komparasi Performa Algoritma Klasikal Sorting")
+        
+        ui.badges(
+            badge_list=[
+                ("Data Structure Algorithm", "default"), 
+                ("Real-Time Analytics", "secondary"), 
+            ], 
+            class_name="flex gap-1 y-2", 
+            key="home_badges"
+        )
+
+        col_a, col_b, col_c = st.columns(3)
+        with col_a:
+            with st.container(border=True):
+                st.markdown("### Tim Sort")
+                st.markdown("<hr style='margin: 8px 0; border: 0; border-top: 1px solid #333;' />", unsafe_allow_html=True)
+                st.caption("Algoritma bawaan python yang membagi data menjadi blok kecil untuk diurutkan lalu digabung secara efisien dan stabil.")
+        
+        with col_b:
+            with st.container(border=True):
+                st.markdown("### Quick Sort")
+                st.markdown("<hr style='margin: 8px 0; border: 0; border-top: 1px solid #333;' />", unsafe_allow_html=True)
+                st.caption("Mempartisi data secara agresif menggunakan elemen pembatas (pivot). Memiliki kecepatan pemrosesan in-place tertinggi pada data acak.")
+        
+        with col_c:
+            with st.container(border=True):
+                st.markdown("### Heap Sort")
+                st.markdown("<hr style='margin: 8px 0; border: 0; border-top: 1px solid #333;' />", unsafe_allow_html=True)
+                st.caption("Memanfaatkan pohon biner (Binary Heap) untuk menyaring nilai ekstrem dari puncak secara berulang tanpa memakan memori tambahan.")
+        
+        col_d, col_e = st.columns(2)
+        with col_d:
+            with st.container(border=True):
+                st.markdown("### Merge Sort")
+                st.markdown("<hr style='margin: 8px 0; border: 0; border-top: 1px solid #333;' />", unsafe_allow_html=True)
+                st.caption("Membagi data secara konstan hingga ukuran terkecil lalu menggabungkannya kembali. Runtime dijamin stabil, namun membutuhkan memori tambahan.")
+                
+        with col_e:
+            with st.container(border=True):
+                st.markdown("### Shell Sort")
+                st.markdown("<hr style='margin: 8px 0; border: 0; border-top: 1px solid #333;' />", unsafe_allow_html=True)
+                st.caption("Evolusi Insertion Sort yang membandingkan data berdasarkan jarak indeks (gap). Ringan untuk data kecil, namun melambat tajam pada data raksasa.")
+
+        st.write("")
+
+        st.subheader("Panduan Penggunaan")
+
+        data_panduan = [
+            {
+                "trigger": "Implementasi Praktis", 
+                "content": "Gunakan modul 'Siswa' di sidebar untuk menguji data riil sekolah. Anda dapat mengunggah file Excel nilai siswa, menyaring tingkat kelas, serta menganalisis perbandingan kecepatan komputasi (runtime) secara langsung dalam satuan milidetik (ms)."
+            },
+            {
+                "trigger": "Perbandingan Algoritma", 
+                "content": "Gunakan modul 'Perbandingan Algoritma' di sidebar untuk validasi teoretis. Modul ini menggunakan generator data acak dengan volume data yang dapat diatur secara fleksibel melalui slider hingga skala masif (1.000.000+ data)."
+            }
+        ]
+
+        ui.accordion(data=data_panduan, class_name="w-full", key="panduan")
+
+        with st.bottom:
+            st.markdown("""
+                <div style="text-align: center; color: #555555; font-size: 12px; padding: 0px 0;">
+                    © 2026 Sortify • Project Akhir Struktur Data & Algoritma
+                </div>
+            """, unsafe_allow_html=True)
 
     def page_siswa(self):
-        st.title("Manajemen Data Siswa")
-        st.markdown("---")
-        
         st.subheader("Unggah Data Siswa")
         masukkan_file = st.file_uploader("Unggah File", type=["csv", "xlsx"])
 
@@ -103,7 +161,7 @@ class StreamlitApp:
         if not (punya_nama and punya_kelas):
             st.error("Struktur file tidak sesuai! kolom Nama Siswa dan Kelas harus ada")
             return
-
+ 
         blacklist_kolom = [kolom.upper() for kolom in ["Nama Siswa", "Kelas", "Nama", "No.", "No", "Nomor", "NIS", "Rata-Rata", "Tahun Ajaran"]]
         mapel_murni = [col for col in df.columns if col.upper() not in blacklist_kolom]
         
@@ -279,7 +337,6 @@ class StreamlitApp:
                             apakah_ascending = False
                         else:
                             apakah_ascending = True
-
                         
                         df_sorted = df_sorted.sort_values(by=kolom_terpilih, ascending=apakah_ascending)
 
