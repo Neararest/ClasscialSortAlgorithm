@@ -363,7 +363,7 @@ class StreamlitApp:
                         st.session_state["total_data"] = len(list_nilai)
 
                     else:
-                        fungsi_sorting = fungsi_sorting_dict[algo_terpilih]
+                        fungsi_sorting = daftar_algo[algo_terpilih]
                         hasil_sort = fungsi_sorting(list_nilai)
 
                         nilai_terurut = hasil_sort if hasil_sort is not None else list_nilai
@@ -428,7 +428,7 @@ class StreamlitApp:
                             fig.update_layout(showlegend=False)
                             st.plotly_chart(fig, use_container_width=True)
                             
-                    elif st.session_state["mode_tampil"] == "tunggal":
+                    elif st.session_state["mode_tampil"] == "Tunggal":
                         df_sorted = st.session_state["hasil_df_siswa"]
                         algo_terpilih = st.session_state["algo_terpilih"]
                         kolom_terpilih = st.session_state["kolom_terpilih"]
