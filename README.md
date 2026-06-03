@@ -28,7 +28,7 @@ Berikut adalah daftar algoritma pengurutan yang diimplementasikan beserta karakt
 Untuk menjalankan platform laboratorium ini di komputer lokal, pastikan Python sudah terinstal lalu jalankan perintah berikut secara berurutan pada terminal:
 
 ```bash
-git clone [https://github.com/Neararest/ClasscialSortAlgorithm.git](https://github.com/Neararest/ClasscialSortAlgorithm.git)
+git clone https://github.com/Neararest/ClasscialSortAlgorithm.git
 cd ClasscialSortAlgorithm
 pip install -r requirements.txt
 streamlit run main.py
