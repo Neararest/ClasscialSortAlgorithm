@@ -11,6 +11,18 @@ Proyek ini dikembangkan sebagai bentuk re-implementasi,dan pengembangan visualis
 - Artikel Acuan: Perbandingan Algoritma Sort Klasik dengan TimSort
 - Tautan Resmi (DOI): https://doi.org/10.31326/jisa.v7i1.1785
 
+## Algoritma yang Diuji & Kompleksitas Waktu
+
+Berikut adalah daftar algoritma pengurutan yang diimplementasikan beserta karakteristik kompleksitas waktunya:
+
+| Algoritma      | Best Case     | Average Case  | Worst Case    |
+| :------------- | :------------ | :------------ | :------------ |
+| **Heap Sort**  | $O(n \log n)$ | $O(n \log n)$ | $O(n \log n)$ |
+| **Merge Sort** | $O(n \log n)$ | $O(n \log n)$ | $O(n \log n)$ |
+| **Quick Sort** | $O(n \log n)$ | $O(n \log n)$ | $O(n^2)$      |
+| **Shell Sort** | $O(n \log n)$ | $O(n^{1.25})$ | $O(n^2)$      |
+| **Tim Sort**   | $O(n)$        | $O(n \log n)$ | $O(n \log n)$ |
+
 ## Instalasi Lokal
 
 Untuk menjalankan platform laboratorium ini di komputer lokal, pastikan Python sudah terinstal lalu jalankan perintah berikut secara berurutan pada terminal:
