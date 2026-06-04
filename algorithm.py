@@ -1,6 +1,7 @@
 import random as rd
 import time
 import pandas as pd
+import gc
 
 rd.seed(42)
 N1 = [rd.randint(0,100) for _ in range(10)]
@@ -110,11 +111,13 @@ if __name__ == "__main__":
         row = {"Algoritma": nama}
         for nama_data, data in dataset:
             arr = data.copy()
+            gc.collect()
             start = time.perf_counter()
             func(arr)   
             end = time.perf_counter()
 
             row[nama_data] = f"{end - start:.6f}"
+            del arr
         hasil.append(row)
 
     df = pd.DataFrame(hasil)

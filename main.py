@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import time
 import random
+import gc
 from PIL import Image
 import plotly.express as px
 from algorithm import heap_sort, mergeSort, quick_sort, tim_sort, shell_sort
@@ -322,12 +323,15 @@ class StreamlitApp:
                         with st.spinner("Menguji efisiensi seluruh algoritma pada data siswa..."):
                             for nama_algo, fungsi_sort in daftar_algo.items():
                                 salinan_data = list_nilai.copy()
-                                
+                                gc.collect()
+
                                 mulai = time.perf_counter()
                                 fungsi_sort(salinan_data)
                                 selesai = time.perf_counter()
                                 
                                 catatan_waktu[nama_algo] = round((selesai - mulai) * 1000, 4)
+
+                                del salinan_data
                         
                         nilai_terurut = list_nilai.copy()
                         tim_sort(nilai_terurut)
@@ -466,6 +470,12 @@ class StreamlitApp:
                 "Shell Sort": shell_sort
             }
             
+            random.seed(42) 
+            bank_data = {}
+            with st.spinner("Menyiapkan dataset acak..."):
+                for n in ukuran_uji:
+                    bank_data[n] = [random.randint(0, 100) for _ in range(n)]
+
             baris_hasil = []
             
             with st.spinner("Sedang menguji ke-5 algoritma secara real-time... Harap tunggu."):
@@ -478,14 +488,17 @@ class StreamlitApp:
                     catatan_algo = {"Algoritma": nama_algo}
                     
                     for n in ukuran_uji:
-                        data_acak = [random.randint(0, 100) for _ in range(n)]
-                        
+                        data_acak = bank_data[n].copy()
+
+                        gc.collect()
                         mulai = time.perf_counter()
                         fungsi_sort(data_acak)
                         selesai = time.perf_counter()
                         
                         durasi = selesai - mulai
                         catatan_algo[f"N={n}"] = round(durasi, 6)
+
+                        del data_acak
                         
                     baris_hasil.append(catatan_algo)
                     
