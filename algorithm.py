@@ -1,19 +1,4 @@
-import random as rd
-import time
-import pandas as pd
-import gc
-
-rd.seed(42)
-N1 = [rd.randint(0,100) for _ in range(10)]
-N10 = [rd.randint(0,100) for _ in range(100)]
-N100 = [rd.randint(0,100) for _ in range(1000)]
-N1000 = [rd.randint(0,100) for _ in range(10000)]
-N10000 = [rd.randint(0,100) for _ in range(100000)]
-N100000 = [rd.randint(0,100) for _ in range(1000000)]
-
-dataset = [("N=10", N1), ("N=100", N10), ("N=1000", N100), ("N=10000", N1000), ("N=100000", N10000), ("N=1000000", N100000)]
-
-def heapify(arr, n, i):
+def heapify(arr, n, i): #Function pembantu untuk heap_sort. Berguna untuk membuat MaxHeap
     largest = i
     l = 2 * i + 1
     r = 2 * i + 2
@@ -28,7 +13,7 @@ def heapify(arr, n, i):
         arr[i], arr[largest] = arr[largest], arr[i]
         heapify(arr, n, largest)
 
-def heap_sort(arr):
+def heap_sort(arr): #HeapSort
     n = len(arr)
     
     for i in range(n // 2 - 1, -1, -1):
@@ -38,7 +23,7 @@ def heap_sort(arr):
         arr[0], arr[i] = arr[i], arr[0] 
         heapify(arr, i, 0)
 
-def quick_sort(arr):
+def quick_sort(arr): #QuickSort
     if len(arr) <= 1:
         return arr
     
@@ -49,7 +34,7 @@ def quick_sort(arr):
 
     return quick_sort(left) + mid + quick_sort(right) 
 
-def mergeSort(arr):
+def mergeSort(arr): #MergeSort
     if len(arr) > 1:
         mid = len(arr)//2
         L = arr[:mid]
@@ -79,7 +64,7 @@ def mergeSort(arr):
             j += 1
             k += 1
 
-def shell_sort(arr):
+def shell_sort(arr): #ShellSort
     n = len(arr)
     gap = n // 2
     
@@ -94,7 +79,7 @@ def shell_sort(arr):
         gap //= 2
     return arr
 
-def tim_sort(arr):
+def tim_sort(arr): #TimSort, Algoritma Bawaan Python
     return sorted(arr)
 
 algoritma = {
@@ -104,21 +89,3 @@ algoritma = {
     "Shell Sort": shell_sort,
     "Tim Sort": tim_sort,
 }
-
-if __name__ == "__main__":
-    hasil = []
-    for nama, func in algoritma.items():
-        row = {"Algoritma": nama}
-        for nama_data, data in dataset:
-            arr = data.copy()
-            gc.collect()
-            start = time.perf_counter()
-            func(arr)   
-            end = time.perf_counter()
-
-            row[nama_data] = f"{end - start:.6f}"
-            del arr
-        hasil.append(row)
-
-    df = pd.DataFrame(hasil)
-    print(df.to_string(index=False, col_space=15, justify='left'))

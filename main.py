@@ -10,7 +10,7 @@ from streamlit_option_menu import option_menu
 import streamlit_shadcn_ui as ui
 
 class StreamlitApp:
-    def __init__(self):
+    def __init__(self): #Inisialisasi aplikasi streamlit dengan title dan logo
         self.title = "Sortify"
         logo = Image.open("Sortify.png")
         st.set_page_config(
@@ -22,12 +22,12 @@ class StreamlitApp:
         if 'page' not in st.session_state:
             st.session_state.page = "Home"
 
-    def render_sidebar(self):
+    def render_sidebar(self): #Render sidebar dengan menu utama
         with st.sidebar:
             pilihan_sidebar = option_menu(
                 menu_title="Main menu",
                 options=["Home", "Siswa", "Perbandingan Algoritma"],
-                icons=["house-door-fill", "person-lines-fill", "arrows-angle-contract"],
+                icons=["house-door-fill", "person-lines-fill", "arrows-angle-contract"], #Icon menggunakan bootstrap Icon
                 menu_icon="cast",
                 default_index=0,
                 styles={
@@ -59,7 +59,7 @@ class StreamlitApp:
             )
         return pilihan_sidebar
     
-    def baca_file_pengguna(self, file):
+    def baca_file_pengguna(self, file): #Membaca file yang diupload oleh pengguna
         nama_file = file.name.lower()
         if nama_file.endswith(".csv"):
             return pd.read_csv(file)
@@ -69,7 +69,7 @@ class StreamlitApp:
             st.error("Format file tidak didukung! Harap gunakan CSV atau XLSX.")
             return None
 
-    def page_home(self):
+    def page_home(self): #Render halaman home
         st.title("SORTIFY")
         st.markdown("---")
         st.subheader("Sistem Analisis Komparasi Performa Algoritma Klasikal Sorting")
@@ -141,7 +141,8 @@ class StreamlitApp:
 
     def page_siswa(self):
         st.subheader("Unggah Data Siswa")
-        masukkan_file = st.file_uploader("Unggah File", type=["csv", "xlsx"])
+        masukkan_file = st.file_uploader("Unggah File", type=["csv", "xlsx"])  #Upload file
+
 
         if masukkan_file is None:
             st.info("Silahkan unggah file CSV atau Excel terlebih dahulu")
@@ -156,15 +157,15 @@ class StreamlitApp:
             return
 
         kolom_upper = [col.upper() for col in df.columns]
-        punya_nama = "NAMA SISWA" in kolom_upper or "NAMA" in kolom_upper
-        punya_kelas = "KELAS" in kolom_upper
+        punya_nama = "NAMA SISWA" in kolom_upper or "NAMA" in kolom_upper #Cek kolom Nama Siswa atau Nama
+        punya_kelas = "KELAS" in kolom_upper #Cek kolom Kelas
         
         if not (punya_nama and punya_kelas):
             st.error("Struktur file tidak sesuai! kolom Nama Siswa dan Kelas harus ada")
             return
  
-        blacklist_kolom = [kolom.upper() for kolom in ["Nama Siswa", "Kelas", "Nama", "No.", "No", "Nomor", "NIS", "Rata-Rata", "Tahun Ajaran"]]
-        mapel_murni = [col for col in df.columns if col.upper() not in blacklist_kolom]
+        blacklist_kolom = [kolom.upper() for kolom in ["Nama Siswa", "Kelas", "Nama", "No.", "No", "Nomor", "NIS", "Rata-Rata", "Tahun Ajaran"]] #Cek kolom yang tidak diinginkan
+        mapel_murni = [col for col in df.columns if col.upper() not in blacklist_kolom] #Cek kolom yang diinginkan
         
         kolom_rata_asli = "Rata-rata"
         for col in df.columns:
@@ -191,7 +192,7 @@ class StreamlitApp:
 
             st.write("")
 
-            if tab == "Data Siswa":
+            if tab == "Data Siswa": #Render Tab data siswa
                 daftar_kelas_unik = df["Kelas"].unique().tolist()
                 kelas_terpilih = st.multiselect(
                     "Filter Kelas",
@@ -209,14 +210,14 @@ class StreamlitApp:
                 st.write("") 
 
                 col_m1, col_m2, col_m3 = st.columns(3)
-                with col_m1:
+                with col_m1: #Total siswa
                     ui.metric_card(
                         title="Total Siswa", 
                         content=f"{len(df_tab1)} Anak", 
                         description="Jumlah siswa lolos filter",
                         key="card_total"
                     )
-                with col_m2:
+                with col_m2: #Rata-rata tertinggi
                     max_val = df_tab1[kolom_rata_asli].max() if len(df_tab1) > 0 else 0
                     ui.metric_card(
                         title="Rata-Rata Tertinggi", 
@@ -224,7 +225,7 @@ class StreamlitApp:
                         description="Nilai rapor tertinggi",
                         key="card_max"
                     )
-                with col_m3:
+                with col_m3: #Rata-rata terendah
                     min_val = df_tab1[kolom_rata_asli].min() if len(df_tab1) > 0 else 0
                     ui.metric_card(
                         title="Rata-Rata Terendah", 
@@ -236,7 +237,7 @@ class StreamlitApp:
                 st.markdown("---")
                 st.dataframe(df_tab1, width="stretch", hide_index=True)
 
-            elif tab == "Konfigurasi Sorting":
+            elif tab == "Konfigurasi Sorting": #Render Tab konfigurasi sorting
                 with st.form(key="form_sorting_siswa"):
 
                     col_header = st.columns(3)
@@ -258,11 +259,11 @@ class StreamlitApp:
 
                     with col_setup2:
                         daftar_algo = {
-                            "Heap Sort": heap_sort,
-                            "Tim Sort": tim_sort,
                             "Merge Sort": mergeSort,
+                            "Heap Sort": heap_sort,
+                            "Shell Sort": shell_sort,
                             "Quick Sort": quick_sort,
-                            "Shell Sort": shell_sort
+                            "Tim Sort": tim_sort
                         }
 
                         opsi_tambahan = list(daftar_algo.keys()) + ["Semua Algoritma"]
@@ -277,7 +278,7 @@ class StreamlitApp:
                     
                     col_action1, col_action2 = st.columns(2)
 
-                    with col_action1:
+                    with col_action1: #Filter kelas
                         opsi_kelas_hasil = df["Kelas"].unique().tolist()
                         kelas_hasil_terpilih = st.multiselect(
                             "Filter Kelas: ",
@@ -286,7 +287,7 @@ class StreamlitApp:
                             key="ms_kelas"
                         )
 
-                    with col_action2:
+                    with col_action2: #Filter jumlah tampilan
                         opsi_limit = ["Tampilkan Semua", "Top 5 Nilai", "Top 10 Nilai"]
                         batas_tampil = st.selectbox(
                             "Jumlah Tampilan:", 
@@ -333,6 +334,7 @@ class StreamlitApp:
 
                                 del salinan_data
                         
+                        # Sorted data for visualization
                         nilai_terurut = list_nilai.copy()
                         tim_sort(nilai_terurut)
                         
@@ -359,7 +361,7 @@ class StreamlitApp:
                             "Waktu Eksekusi (ms)": list(catatan_waktu.values())
                         })
 
-                        st.session_state["hasil_df_siswa"] = df_sorted
+                        st.session_state["hasil_df_siswa"] = df_sorted 
                         st.session_state["hasil_df_komparasi"] = df_komparasi
                         st.session_state["mode_tampil"] = "Semua Algoritma"
                         st.session_state["kolom_terpilih"] = kolom_terpilih
@@ -395,8 +397,8 @@ class StreamlitApp:
                         st.session_state["kolom_terpilih"] = kolom_terpilih
                         st.session_state["batas_tampil"] = batas_tampil
 
-                if "mode_tampil" in st.session_state:
-                    if st.session_state["mode_tampil"] == "Semua Algoritma":
+                if "mode_tampil" in st.session_state: #Render Tab hasil sorting
+                    if st.session_state["mode_tampil"] == "Semua Algoritma": #Render Tab hasil sorting semua algoritma
                         df_sorted = st.session_state["hasil_df_siswa"]
                         df_komparasi = st.session_state["hasil_df_komparasi"]
                         kolom_terpilih = st.session_state["kolom_terpilih"]
@@ -432,7 +434,7 @@ class StreamlitApp:
                             fig.update_layout(showlegend=False)
                             st.plotly_chart(fig, use_container_width=True)
                             
-                    elif st.session_state["mode_tampil"] == "Tunggal":
+                    elif st.session_state["mode_tampil"] == "Tunggal": #Render Tab hasil sorting tunggal
                         df_sorted = st.session_state["hasil_df_siswa"]
                         algo_terpilih = st.session_state["algo_terpilih"]
                         kolom_terpilih = st.session_state["kolom_terpilih"]
@@ -442,7 +444,7 @@ class StreamlitApp:
                         st.subheader(f"{batas_tampil} Berdasarkan {kolom_terpilih} (Menggunakan {algo_terpilih})")
                         st.dataframe(df_sorted, use_container_width=True, hide_index=True)
                     
-    def page_algoritma(self):
+    def page_algoritma(self): #Render Halaman perbandingan algoritma
         st.title("Perbandingan Algoritma")
         st.markdown("---")
         with st.container(border=True):
@@ -457,7 +459,7 @@ class StreamlitApp:
             st.write("")
             tombol_simulasi = st.button("Jalankan Pengujian Real-Time", use_container_width=True)
 
-        if tombol_simulasi:
+        if tombol_simulasi: #Render Tombol simulasi pengujian real-time
 
             semua_n = [100, 500, 1000, 5000, 10000, 50000, 100000, 250000, 500000, 1000000, 1500000]
             ukuran_uji = [n for n in semua_n if n <= opsi_max_n]
@@ -478,11 +480,11 @@ class StreamlitApp:
 
             baris_hasil = []
             
-            with st.spinner("Sedang menguji ke-5 algoritma secara real-time... Harap tunggu."):
+            with st.spinner("Sedang menguji ke-5 algoritma secara real-time... Harap tunggu."): #Render Spinner pengujian real-time
                 
                 total_langkah = len(daftar_algo)
                 
-                for index, (nama_algo, fungsi_sort) in enumerate(daftar_algo.items()):
+                for index, (nama_algo, fungsi_sort) in enumerate(daftar_algo.items()): #Render Loop pengujian algoritma
                     status_uji = st.caption(f"Sedang berjalan: **{nama_algo}** ({index+1}/{total_langkah})")
                     
                     catatan_algo = {"Algoritma": nama_algo}
@@ -511,7 +513,7 @@ class StreamlitApp:
             df_hasil = pd.DataFrame(baris_hasil)
 
             st.subheader("Tabel Hasil Komparasi Kecepatan (Detik)")
-            st.dataframe(df_hasil, hide_index=True, use_container_width=True)
+            st.dataframe(df_hasil, hide_index=True, use_container_width=True) #Render Tabel hasil komparasi kecepatan
             
             st.markdown("---")
             st.subheader("Grafik Tren Pertumbuhan Waktu (Time Complexity)")
@@ -534,7 +536,7 @@ class StreamlitApp:
             st.plotly_chart(fig, use_container_width=True)
             st.caption("Arahkan kursor ke titik grafik untuk melihat detail waktu. Klik nama algoritma di legenda atas untuk menyembunyikan garis.")
 
-    def run(self):
+    def run(self): #Render halaman utama
         menu_terpilih = self.render_sidebar()
         
         if menu_terpilih == "Home":
@@ -544,6 +546,6 @@ class StreamlitApp:
         elif menu_terpilih == "Perbandingan Algoritma":
             self.page_algoritma()
 
-if __name__ == "__main__":
+if __name__ == "__main__": #Menjalankan aplikasi
     app = StreamlitApp()
     app.run()
