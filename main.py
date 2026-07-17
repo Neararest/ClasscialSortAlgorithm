@@ -546,6 +546,6 @@ class StreamlitApp:
         elif menu_terpilih == "Perbandingan Algoritma":
             self.page_algoritma()
 
-if __name__ == "__main__": #Menjalankan aplikasi
+if __name__ == "__main__": #Menjalankan Aplikasi
     app = StreamlitApp()
     app.run()
